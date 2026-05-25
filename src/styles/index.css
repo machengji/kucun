@@ -736,3 +736,79 @@ body {
 .btn-cat-add:hover {
   background-color: var(--primary-hover);
 }
+
+/* ===== 高阶操作列表 (Action Sheet) ===== */
+.action-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.25);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 600;
+  display: flex;
+  align-items: flex-end;
+  animation: fadeIn 0.24s ease forwards;
+}
+
+.action-sheet-container {
+  background-color: var(--bg-card);
+  width: 100%;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 20px 24px 32px;
+  box-shadow: var(--shadow-drawer);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transform: translateY(100%);
+  animation: slideUp var(--transition-normal) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.action-sheet-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.action-sheet-btn {
+  background-color: var(--bg-control);
+  color: var(--text-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all var(--transition-fast);
+}
+
+.action-sheet-btn:hover {
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+  transform: scale(1.01);
+}
+
+.action-sheet-btn:active {
+  transform: scale(0.99);
+}
+
+.action-sheet-btn.btn-cancel {
+  background-color: rgba(239, 68, 68, 0.08);
+  color: var(--danger-color);
+  margin-top: 4px;
+}
+
+.action-sheet-btn.btn-cancel:hover {
+  background-color: var(--danger-color);
+  color: white;
+}
