@@ -35,7 +35,7 @@ function App() {
   const [toastMsg, setToastMsg] = useState('');
 
   // ===== 核心 Hook 实例 =====
-  const { stream, isActive, startCamera, stopCamera, capture } = useCamera();
+  const { isActive, startCamera, stopCamera, capture } = useCamera();
   const { compressImage } = useCompress();
 
   // ===== 数据生命周期：加载本地 LocalStorage 数据 =====
@@ -180,6 +180,11 @@ function App() {
     window.dispatchEvent(new Event('trigger-album-select'));
   }, []);
 
+  // 关闭摄像头弹层（使用 useCallback 确保引用稳定，避免 CameraModal 的 useEffect 被重复触发）
+  const handleCameraClose = useCallback(() => {
+    setIsCameraOpen(false);
+  }, []);
+
   // 拍照捕获完毕的回调
   const handleCameraCapture = useCallback((dataUrl) => {
     setTempImage(dataUrl);
@@ -295,7 +300,7 @@ function App() {
         stopCamera={stopCamera}
         capture={capture}
         onCapture={handleCameraCapture}
-        onClose={() => setIsCameraOpen(false)}
+        onClose={handleCameraClose}
       />
 
       {/* 分类管理弹层 */}
