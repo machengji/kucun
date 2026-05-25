@@ -10,13 +10,13 @@ export function FormDrawer({
   onTriggerCamera,
   compressImage,
   tempCapturedImage,        // 从主 App 传过来的临时拍照数据
-  clearTempCapturedImage    // 拍照完成用于重置的方法
+  clearTempCapturedImage,   // 拍照完成用于重置的方法
+  onShowActionSheet         // 通知父组件展示 Action Sheet（在 DOM 最外层渲染，避免堆叠上下文遮挡）
 }) {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('未分类');
   const [stock, setStock] = useState('');
   const [image, setImage] = useState(null);
-  const [showActionSheet, setShowActionSheet] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -34,8 +34,6 @@ export function FormDrawer({
         setStock('');
         setImage(null);
       }
-    } else {
-      setShowActionSheet(false);
     }
   }, [isOpen, record, categories]);
 
@@ -54,27 +52,13 @@ export function FormDrawer({
     }
   }, [categories, record, isOpen]);
 
-  // 点击照片区域的处理逻辑 (唤起 Action Sheet 选择来源)
+  // 点击照片区域 → 通知父组件弹出 Action Sheet
   const handlePhotoClick = () => {
-    setShowActionSheet(true);
+    onShowActionSheet();
   };
 
-  // 选择摄像头拍照
-  const handleCameraSelect = async () => {
-    setShowActionSheet(false);
-    try {
-      await onTriggerCamera();
-    } catch (err) {
-      onShowToast('摄像头调取失败，已切换至相册选择');
-      if (fileInputRef.current) {
-        fileInputRef.current.click();
-      }
-    }
-  };
-
-  // 选择从手机相册上传
-  const handleAlbumSelect = () => {
-    setShowActionSheet(false);
+  // 当从 Action Sheet 选择"相册"后，父组件会调用此方法触发隐藏的 file input
+  const triggerFileInput = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
@@ -116,7 +100,6 @@ export function FormDrawer({
       return;
     }
 
-
     onSave({
       id: record ? record.id : null,
       name: trimmedName,
@@ -125,6 +108,22 @@ export function FormDrawer({
       image
     });
   };
+
+  // 暴露 triggerFileInput 给父组件，通过 ref 或直接通过 prop 回调均可。
+  // 此处使用 useEffect 在挂载时把方法注册到父级
+  useEffect(() => {
+    // 将 triggerFileInput 方法挂载到 window 上，供 App.jsx 调用
+    // 使用更优雅的自定义事件来解耦
+    const handleAlbumTrigger = () => {
+      if (fileInputRef.current) {
+        fileInputRef.current.click();
+      }
+    };
+    window.addEventListener('trigger-album-select', handleAlbumTrigger);
+    return () => {
+      window.removeEventListener('trigger-album-select', handleAlbumTrigger);
+    };
+  }, []);
 
   return (
     <div
@@ -195,7 +194,7 @@ export function FormDrawer({
           </div>
 
           <div className="form-group">
-            <label>商品照片</label>
+            <label>商品照片（可选）</label>
             <div className="photo-preview" onClick={handlePhotoClick}>
               {image ? (
                 <img src={image} alt="商品预览" />
@@ -214,7 +213,6 @@ export function FormDrawer({
               type="file"
               id="fileInput"
               accept="image/*"
-              capture="environment"
               onChange={handleFileChange}
               style={{ display: 'none' }}
             />
@@ -225,33 +223,6 @@ export function FormDrawer({
           </button>
         </form>
       </div>
-      
-      {/* 极美 iOS 风格操作面板 (Action Sheet) */}
-      {showActionSheet && (
-        <div className="action-sheet-overlay" onClick={() => setShowActionSheet(false)}>
-          <div className="action-sheet-container" onClick={(e) => e.stopPropagation()}>
-            <div className="action-sheet-title">选择图片来源</div>
-            <button type="button" className="action-sheet-btn" onClick={handleCameraSelect}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                <circle cx="12" cy="13" r="4" />
-              </svg>
-              使用摄像头拍照
-            </button>
-            <button type="button" className="action-sheet-btn" onClick={handleAlbumSelect}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <polyline points="21 15 16 10 5 21" />
-              </svg>
-              从手机相册选择
-            </button>
-            <button type="button" className="action-sheet-btn btn-cancel" onClick={() => setShowActionSheet(false)}>
-              取消
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

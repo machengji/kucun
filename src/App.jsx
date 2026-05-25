@@ -23,6 +23,7 @@ function App() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isCatOpen, setIsCatOpen] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [showActionSheet, setShowActionSheet] = useState(false);
   
   // 当前正在编辑的商品对象 (null 代表新增)
   const [editingRecord, setEditingRecord] = useState(null);
@@ -155,15 +156,28 @@ function App() {
     setIsFormOpen(true);
   }, []);
 
-  // ===== 触发开启摄像头 =====
-  const handleTriggerCamera = useCallback(async () => {
+  // ===== Action Sheet 回调 =====
+  const handleShowActionSheet = useCallback(() => {
+    setShowActionSheet(true);
+  }, []);
+
+  // 选择摄像头拍照
+  const handleCameraSelect = useCallback(async () => {
+    setShowActionSheet(false);
     try {
-      // 尝试调用摄像头，如果权限拒绝或不支持则抛出异常，表单组件会捕获异常并降级调起文件上传
       setIsCameraOpen(true);
     } catch (err) {
       setIsCameraOpen(false);
-      throw err;
+      showToast('摄像头调取失败，已切换至相册选择');
+      window.dispatchEvent(new Event('trigger-album-select'));
     }
+  }, [showToast]);
+
+  // 选择从手机相册上传
+  const handleAlbumSelect = useCallback(() => {
+    setShowActionSheet(false);
+    // 通过自定义事件通知 FormDrawer 触发其内部的 file input
+    window.dispatchEvent(new Event('trigger-album-select'));
   }, []);
 
   // 拍照捕获完毕的回调
@@ -263,13 +277,15 @@ function App() {
         onClose={() => {
           setIsFormOpen(false);
           setEditingRecord(null);
+          setShowActionSheet(false);
         }}
         onSave={handleSaveRecord}
         onShowToast={showToast}
-        onTriggerCamera={handleTriggerCamera}
+        onTriggerCamera={handleCameraSelect}
         compressImage={compressImage}
         tempCapturedImage={tempImage}
         clearTempCapturedImage={() => setTempImage(null)}
+        onShowActionSheet={handleShowActionSheet}
       />
 
       {/* 摄像头拍照弹层 */}
@@ -290,6 +306,33 @@ function App() {
         onAddCategory={handleAddCategory}
         onDeleteCategory={handleDeleteCategory}
       />
+
+      {/* iOS 风格 Action Sheet — 在 DOM 最外层渲染，避免被 FormDrawer 的 backdrop-filter 堆叠上下文遮挡 */}
+      {showActionSheet && (
+        <div className="action-sheet-overlay" onClick={() => setShowActionSheet(false)}>
+          <div className="action-sheet-container" onClick={(e) => e.stopPropagation()}>
+            <div className="action-sheet-title">选择图片来源</div>
+            <button type="button" className="action-sheet-btn" onClick={handleCameraSelect}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+              使用摄像头拍照
+            </button>
+            <button type="button" className="action-sheet-btn" onClick={handleAlbumSelect}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
+              </svg>
+              从手机相册选择
+            </button>
+            <button type="button" className="action-sheet-btn btn-cancel" onClick={() => setShowActionSheet(false)}>
+              取消
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 简易吐司弹窗 */}
       <Toast message={toastMsg} onClose={handleCloseToast} />

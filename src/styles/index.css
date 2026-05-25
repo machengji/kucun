@@ -768,6 +768,11 @@ body {
   to { opacity: 1; }
 }
 
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
 .action-sheet-title {
   font-size: 13px;
   font-weight: 600;
