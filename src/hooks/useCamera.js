@@ -10,17 +10,23 @@ export function useCamera() {
 
   const startCamera = useCallback(async (videoElement) => {
     try {
-      // 优先请求后置摄像头且定义较为理想的分辨率
-      const constraints = {
-        video: {
-          facingMode: { ideal: 'environment' },
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        },
-        audio: false
-      };
+      let mediaStream;
+      
+      try {
+        // 第一步：尝试以兼容性最好的后置摄像头参数进行请求 (省略多余分辨率强限制，防 Overconstrained 报错)
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' } },
+          audio: false
+        });
+      } catch (err) {
+        console.warn('后置摄像头首选调用失败，执行二级默认视频流降级:', err);
+        // 第二步：降级为最宽泛的默认视频通道请求 (保证绝对能获取到流，不报 404/Null)
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false
+        });
+      }
 
-      const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = mediaStream;
       setStream(mediaStream);
       setIsActive(true);
@@ -30,7 +36,7 @@ export function useCamera() {
       }
       return mediaStream;
     } catch (error) {
-      console.error('摄像头调用失败，启动降级上传模式:', error);
+      console.error('摄像头所有尝试均调用失败，启动传统文件降级:', error);
       setIsActive(false);
       throw error;
     }

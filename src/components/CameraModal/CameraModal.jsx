@@ -30,8 +30,10 @@ export function CameraModal({ isOpen, startCamera, stopCamera, capture, onCaptur
     <div className={`camera-overlay ${isOpen ? 'active' : ''}`}>
       <video
         ref={videoRef}
-        autoplay
-        playsinline
+        autoPlay
+        playsInline
+        webkit-playsinline="true"
+        x5-video-player-type="h5-page"
         muted
       />
       <div className="camera-btns">
