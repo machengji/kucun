@@ -1,0 +1,75 @@
+:root {
+  /* ===== Modern Tech Minimalist (科技靛蓝) 配色系统 ===== */
+  --primary-color: #4f46e5;       /* 科技靛蓝 */
+  --primary-hover: #6366f1;       /* 柔亮靛蓝 */
+  --primary-active: #4338ca;      /* 深沉靛蓝 */
+  --primary-light: #e0e7ff;       /* 极浅蓝紫底 */
+  
+  --success-color: #10b981;       /* 高级翡翠绿 */
+  --success-hover: #34d399;
+  --success-light: #d1fae5;
+  
+  --danger-color: #ef4444;        /* 高阶朱砂红 */
+  --danger-hover: #f87171;
+  --danger-light: #fee2e2;
+  
+  --warning-color: #f59e0b;       /* 高雅琥珀黄 */
+  --warning-light: #fef3c7;
+  
+  /* 极致考究的中性色系统 */
+  --text-primary: #0f172a;        /* Slate-900 曜石黑 */
+  --text-secondary: #475569;      /* Slate-600 深空灰 */
+  --text-tertiary: #94a3b8;       /* Slate-400 迷雾灰 */
+  --text-light: #cbd5e1;          /* Slate-300 浅云灰 */
+  
+  --bg-layout: #f8fafc;           /* Slate-50 极淡灰蓝底色 */
+  --bg-card: #ffffff;             /* 纯净卡片白 */
+  --bg-sidebar: #ffffff;          /* 纯净边栏白 */
+  --bg-control: #f1f5f9;          /* Slate-100 浅灰蓝控制底 */
+  
+  --border-color: #e2e8f0;        /* Slate-200 柔和灰边框 */
+  --border-color-light: #f8fafc;  /* 隐形极淡边框 */
+  
+  /* 极致空气感 3D 浮动投影系统 */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.03);
+  --shadow-md: 0 8px 24px -4px rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.02);
+  --shadow-lg: 0 20px 40px -8px rgba(15, 23, 42, 0.06), 0 10px 20px -4px rgba(15, 23, 42, 0.03);
+  --shadow-primary: 0 6px 20px -4px rgba(79, 70, 229, 0.35);
+  --shadow-drawer: 0 -12px 40px rgba(15, 23, 42, 0.06);
+
+  /* 大气优雅的几何圆角 */
+  --radius-lg: 24px;              /* 大圆角抽屉 */
+  --radius-md: 16px;              /* 卡片、表单框 */
+  --radius-sm: 10px;              /* 小标签、按钮 */
+  --radius-full: 9999px;          /* 胶囊搜索框 */
+
+  /* 丝滑动画时间 */
+  --transition-fast: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* 曜石极暗模式的高清适配 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #64748b;
+    
+    --bg-layout: #0b0f19;          /* 深灰蓝极暗底 */
+    --bg-card: #131a2b;            /* 纯深蓝灰卡片 */
+    --bg-sidebar: #131a2b;
+    --bg-control: #1e293b;
+    
+    --border-color: #1e293b;
+    --border-color-light: #131a2b;
+    
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 20px 40px -8px rgba(0, 0, 0, 0.4);
+    --shadow-primary: 0 6px 20px -4px rgba(79, 70, 229, 0.45);
+    --shadow-drawer: 0 -12px 40px rgba(0, 0, 0, 0.35);
+    
+    --primary-light: #1e293b;
+  }
+}
